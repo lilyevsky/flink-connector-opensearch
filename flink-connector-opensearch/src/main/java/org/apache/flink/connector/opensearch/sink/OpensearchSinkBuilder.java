@@ -27,6 +27,7 @@ import org.apache.http.HttpHost;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.apache.flink.connector.opensearch.sink.OpensearchWriter.DEFAULT_FAILURE_HANDLER;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 import static org.apache.flink.util.Preconditions.checkState;
@@ -72,6 +73,7 @@ public class OpensearchSinkBuilder<IN> {
     private Integer connectionRequestTimeout;
     private Integer socketTimeout;
     private Boolean allowInsecure;
+    private FailureHandler failureHandler = DEFAULT_FAILURE_HANDLER;
 
     public OpensearchSinkBuilder() {}
 
@@ -162,6 +164,7 @@ public class OpensearchSinkBuilder<IN> {
      * @param intervalMillis the bulk flush interval, in milliseconds.
      * @return this builder
      */
+    @SuppressWarnings("UnusedReturnValue")
     public OpensearchSinkBuilder<IN> setBulkFlushInterval(long intervalMillis) {
         checkState(
                 intervalMillis == -1 || intervalMillis >= 0,
@@ -229,6 +232,7 @@ public class OpensearchSinkBuilder<IN> {
      * @param prefix for the communication
      * @return this builder
      */
+    @SuppressWarnings("UnusedReturnValue")
     public OpensearchSinkBuilder<IN> setConnectionPathPrefix(String prefix) {
         checkNotNull(prefix);
         this.connectionPathPrefix = prefix;
@@ -286,6 +290,19 @@ public class OpensearchSinkBuilder<IN> {
     }
 
     /**
+     * Allows to set custom failure handler. If not set, then the DEFAULT_FAILURE_HANDLER will be
+     * used which throws a runtime exception upon receiving a failure.
+     *
+     * @param failureHandler the custom handler
+     * @return this builder
+     */
+    public OpensearchSinkBuilder<IN> setFailureHandler(FailureHandler failureHandler) {
+        checkNotNull(failureHandler);
+        this.failureHandler = failureHandler;
+        return self();
+    }
+
+    /**
      * Constructs the {@link OpensearchSink} with the properties configured this builder.
      *
      * @return {@link OpensearchSink}
@@ -298,7 +315,12 @@ public class OpensearchSinkBuilder<IN> {
         BulkProcessorConfig bulkProcessorConfig = buildBulkProcessorConfig();
 
         return new OpensearchSink<>(
-                hosts, emitter, deliveryGuarantee, bulkProcessorConfig, networkClientConfig);
+                hosts,
+                emitter,
+                deliveryGuarantee,
+                bulkProcessorConfig,
+                networkClientConfig,
+                failureHandler);
     }
 
     private NetworkClientConfig buildNetworkClientConfig() {
