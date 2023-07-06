@@ -73,9 +73,12 @@ public class OpensearchSinkBuilder<IN> {
     private Integer connectionRequestTimeout;
     private Integer socketTimeout;
     private Boolean allowInsecure;
+    private RestClientFactory restClientFactory;
     private FailureHandler failureHandler = DEFAULT_FAILURE_HANDLER;
 
-    public OpensearchSinkBuilder() {}
+    public OpensearchSinkBuilder() {
+        restClientFactory = new DefaultRestClientFactory();
+    }
 
     @SuppressWarnings("unchecked")
     protected <S extends OpensearchSinkBuilder<?>> S self() {
@@ -290,6 +293,18 @@ public class OpensearchSinkBuilder<IN> {
     }
 
     /**
+     * Sets the {@link RestClientFactory} to be used for configuring the instance of the OpenSearch
+     * REST client.
+     *
+     * @param restClientFactory the {@link RestClientFactory} instance
+     * @return this builder
+     */
+    public OpensearchSinkBuilder<IN> setRestClientFactory(RestClientFactory restClientFactory) {
+        this.restClientFactory = checkNotNull(restClientFactory);
+        return self();
+    }
+
+    /**
      * Allows to set custom failure handler. If not set, then the DEFAULT_FAILURE_HANDLER will be
      * used which throws a runtime exception upon receiving a failure.
      *
@@ -320,6 +335,7 @@ public class OpensearchSinkBuilder<IN> {
                 deliveryGuarantee,
                 bulkProcessorConfig,
                 networkClientConfig,
+                restClientFactory,
                 failureHandler);
     }
 

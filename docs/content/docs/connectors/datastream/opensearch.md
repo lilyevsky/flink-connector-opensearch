@@ -39,11 +39,32 @@ the following dependency to your project:
   <tbody>
     <tr>
         <td>1.x</td>
-        <td>{{< connector_artifact flink-connector-opensearch 1.0.0 >}}</td>
+        <td>{{< connector_artifact flink-connector-opensearch opensearch >}}</td>
     </tr>
     <tr>
         <td>2.x</td>
-        <td>{{< connector_artifact flink-connector-opensearch 1.0.0 >}}</td>
+        <td>
+          {{< connector_artifact flink-connector-opensearch opensearch >}}
+
+          By default, Apache Flink Opensearch Connector uses 1.3.x client libraries. You could switch to use 2.x (or upcoming 3.x) clients noting that those require **JDK-11 or above**, for example.
+
+          ```xml
+          <dependencyManagement>
+              <dependencies>
+                  <dependency>
+                      <groupId>org.opensearch</groupId>
+                      <artifactId>opensearch</artifactId>
+                      <version>2.5.0</version>
+                  </dependency>          
+                  <dependency>
+                      <groupId>org.opensearch.client</groupId>
+                      <artifactId>opensearch-rest-high-level-client</artifactId>
+                      <version>2.5.0</version>
+                  </dependency>
+              </dependencies>
+          </dependencyManagement>
+          ```
+        </td>
     </tr>
   </tbody>
 </table>
@@ -253,7 +274,7 @@ More information about Opensearch can be found [here](https://opensearch.org/).
 
 For the execution of your Flink program, it is recommended to build a
 so-called uber-jar (executable jar) containing all your dependencies
-(see [here]({{< ref "docs/dev/configuration" >}}) for further information).
+(see [here]({{< ref "docs/dev/configuration/overview" >}}) for further information).
 
 Alternatively, you can put the connector's jar file into Flink's `lib/` folder to make it available
 system-wide, i.e. for all job being run.

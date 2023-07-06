@@ -330,7 +330,8 @@ class OpensearchWriterITCase {
                         true),
                 metricGroup,
                 new TestMailbox(),
-                failureHandler);
+                new DefaultRestClientFactory(),
+                DEFAULT_FAILURE_HANDLER);
     }
 
     private static class UpdatingEmitter implements OpensearchEmitter<Tuple2<Integer, String>> {
